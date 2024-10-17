@@ -1,8 +1,6 @@
 package config
 
-import (
-	"os"
-)
+import "os"
 
 const (
 	// OverrideContainersConfig holds the default config path overridden by the root user
@@ -14,10 +12,15 @@ const (
 	// DefaultSignaturePolicyPath is the default value for the
 	// policy.json file.
 	DefaultSignaturePolicyPath = "/usr/local/etc/containers/policy.json"
-
-	// Mount type for mounting host dir
-	_typeBind = "nullfs"
 )
+
+var defaultHelperBinariesDir = []string{
+	"/usr/local/bin",
+	"/usr/local/libexec/podman",
+	"/usr/local/lib/podman",
+	"/usr/local/libexec/podman",
+	"/usr/local/lib/podman",
+}
 
 // podman remote clients on freebsd cannot use unshare.isRootless() to determine the configuration file locations.
 func customConfigFile() (string, error) {
@@ -29,12 +32,4 @@ func customConfigFile() (string, error) {
 
 func ifRootlessConfigPath() (string, error) {
 	return rootlessConfigPath()
-}
-
-var defaultHelperBinariesDir = []string{
-	"/usr/local/bin",
-	"/usr/local/libexec/podman",
-	"/usr/local/lib/podman",
-	"/usr/local/libexec/podman",
-	"/usr/local/lib/podman",
 }
