@@ -1510,13 +1510,12 @@ func (mh *MetaHeadersFrame) checkPseudos() error {
 }
 
 func (fr *Framer) maxHeaderStringLen() int {
-	v := fr.maxHeaderListSize()
-	if uint32(int(v)) == v {
-		return int(v)
+	v := int(fr.maxHeaderListSize())
+	if v < 0 {
+		// If maxHeaderListSize overflows an int, use no limit (0).
+		return 0
 	}
-	// They had a crazy big number for MaxHeaderBytes anyway,
-	// so give them unlimited header lengths:
-	return 0
+	return v
 }
 
 // readMetaFrame returns 0 or more CONTINUATION frames from fr and
@@ -1592,7 +1591,7 @@ func (fr *Framer) readMetaFrame(hf *HeadersFrame) (*MetaHeadersFrame, error) {
 				log.Printf("http2: header list too large")
 			}
 			// It would be nice to send a RST_STREAM before sending the GOAWAY,
-			// but the struture of the server's frame writer makes this difficult.
+			// but the structure of the server's frame writer makes this difficult.
 			return nil, ConnectionError(ErrCodeProtocol)
 		}
 
@@ -1604,7 +1603,7 @@ func (fr *Framer) readMetaFrame(hf *HeadersFrame) (*MetaHeadersFrame, error) {
 				log.Printf("http2: invalid header: %v", invalid)
 			}
 			// It would be nice to send a RST_STREAM before sending the GOAWAY,
-			// but the struture of the server's frame writer makes this difficult.
+			// but the structure of the server's frame writer makes this difficult.
 			return nil, ConnectionError(ErrCodeProtocol)
 		}
 
